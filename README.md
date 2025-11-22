@@ -1,8 +1,6 @@
-# transaction-categorization
+# Transaction Categorization using Machine Learning
 
-Transaction Categorization using Machine Learning
-
-Overview
+## Overview
 
 This project focuses on extracting structured, meaningful information from bank transaction descriptions, which are typically messy, and ambiguous. The goal is to build a machine-learning-driven system that can:
 
