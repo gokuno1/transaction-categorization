@@ -24,7 +24,7 @@ Transaction Type Identification is the first layer of the transaction categoriza
 └────────┬────────┘
          ▼
 ┌─────────────────┐     ┌──────────────────────────────────────┐
-│  1. Regex Match │────▶│ Patterns: \bUPI\b, \bNEFT\b, \bIMPS\b │
+│  1. Regex Match │────▶│ Patterns: \bUPI\b, \bNEFT\b, \bIMPS\b│
 │   (Score: 1.0)  │     └──────────────────────────────────────┘
 └────────┬────────┘
          │ No match
@@ -36,7 +36,7 @@ Transaction Type Identification is the first layer of the transaction categoriza
          │ No match
          ▼
 ┌─────────────────┐     ┌────────────────────────────────────────────┐
-│ 3. Fuzzy Match  │────▶│ RapidFuzz partial_ratio, threshold >= 75  │
+│ 3. Fuzzy Match  │────▶│ RapidFuzz partial_ratio, threshold >= 75   │
 │   (Score: 0.75) │     └────────────────────────────────────────────┘
 └────────┬────────┘
          │ No match
@@ -121,13 +121,13 @@ output = "GOIBIBO HOTEL BOOKING"
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                     Feature Engineering Pipeline                     │
+│                     Feature Engineering Pipeline                    │
 └─────────────────────────────────────────────────────────────────────┘
                                     │
         ┌───────────────────────────┼───────────────────────────┐
         ▼                           ▼                           ▼
 ┌───────────────────┐   ┌───────────────────┐   ┌───────────────────┐
-│   Text Features   │   │ Numerical Features│   │Categorical Features│
+│   Text Features   │   │ Numerical Features│   │Categorical Feature│
 ├───────────────────┤   ├───────────────────┤   ├───────────────────┤
 │ normalized_desc   │   │     amount        │   │     dr_cr         │
 │ merchant_name     │   │                   │   │  transaction_type │
@@ -135,7 +135,7 @@ output = "GOIBIBO HOTEL BOOKING"
           │                       │                       │
           ▼                       │                       │
 ┌───────────────────┐             │                       │
-│ SentenceTransformer│             │                       │
+│SentenceTransformer│             │                       │
 │ all-MiniLM-L6-v2  │             │                       │
 │ → 384-dim vectors │             │                       │
 └─────────┬─────────┘             │                       │
