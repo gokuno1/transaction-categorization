@@ -163,6 +163,7 @@ output = "GOIBIBO HOTEL BOOKING"
 
 We can utilise LLM capabilities to identify category of the transaction, using different approach mentioned below:
 1. LLM API
+   ```
    Pros:
      * No training required
      * Handles edge cases well
@@ -171,8 +172,9 @@ We can utilise LLM capabilities to identify category of the transaction, using d
      * High cost at scale
      * Data privacy concerns (sending transactions to external API)
      * Rate limits
-  
+   ```
 3. Fine-tuned Open-Source LLM
+   ```
    Pros:
      * Better accuracy than zero-shot
      * Runs locally (data privacy)
@@ -182,7 +184,7 @@ We can utilise LLM capabilities to identify category of the transaction, using d
      * Requires GPU infrastructure
      * Training complexity
      * Model maintenance
-
+   ```
 
 ## Quick Start
 
