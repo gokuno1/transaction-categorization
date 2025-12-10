@@ -158,6 +158,28 @@ output = "GOIBIBO HOTEL BOOKING"
                     │  Category + Confidence Score  │
                     └───────────────────────────────┘
 ```
+** LLMs can be used for this task.
+We can utilise LLM capabilities to identify category of the transaction, using different approach mentioned below:
+1. LLM API
+   Pros:
+     * No training required
+     * Handles edge cases well
+     * Easy to update (just change prompt)
+   Cons:
+     * High cost at scale
+     * Data privacy concerns (sending transactions to external API)
+     * Rate limits
+  
+3. Fine-tuned Open-Source LLM
+   Pros:
+     * Better accuracy than zero-shot
+     * Runs locally (data privacy)
+     * One-time training cost
+     * No API costs
+   Cons:
+     * Requires GPU infrastructure
+     * Training complexity
+     * Model maintenance
 
 
 ## Quick Start
