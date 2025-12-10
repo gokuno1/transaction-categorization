@@ -158,7 +158,9 @@ output = "GOIBIBO HOTEL BOOKING"
                     │  Category + Confidence Score  │
                     └───────────────────────────────┘
 ```
-** LLMs can be used for this task.
+
+## LLMs can be used for this task.
+
 We can utilise LLM capabilities to identify category of the transaction, using different approach mentioned below:
 1. LLM API
    Pros:
