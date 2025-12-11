@@ -1,0 +1,205 @@
+================================================================================
+TRANSACTION CATEGORIZATION SYSTEM - EXECUTION COMMANDS
+================================================================================
+
+--------------------------------------------------------------------------------
+1. SETUP PYTHON VIRTUAL ENVIRONMENT
+--------------------------------------------------------------------------------
+
+# Navigate to project directory
+cd /path/to/categorization
+
+# Create virtual environment (if not already created)
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+
+--------------------------------------------------------------------------------
+2. DATA PREPROCESSING - Identify Transaction Types
+--------------------------------------------------------------------------------
+# Uses transaction_type_classifier.py to classify transaction types (UPI, CARD, 
+# ACH, IMPS, NEFT, etc.) and normalize descriptions.
+# No ML models required - uses regex, keyword, and fuzzy matching.
+
+# Basic command (transaction type classification only)
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_filename_with_transaction_type.csv
+
+# With detailed matching information (matched text, score, rule)
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_filename_with_transaction_type.csv \
+  -d
+
+# Custom description column name
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_filename_with_transaction_type.csv \
+  -c description \
+  -d
+
+
+--------------------------------------------------------------------------------
+3. TRAIN NER AND SEQ2SEQ MODELS (Merchant Name Extraction)
+--------------------------------------------------------------------------------
+# Training data requires columns: description, merchant_name, amount, dr_cr
+
+# Train NER model only
+python -m transaction_categorization_v2.train \
+  --model ner \
+  --data data/training_file_with_transaction_type_and_merchant_name.csv \
+  --ner-output models/merchant_name/ner_model \
+  --epochs 3 \
+  --batch-size 16
+
+# Train Seq2Seq model only
+python -m transaction_categorization_v2.train \
+  --model seq2seq \
+  --data data/training_file_with_transaction_type_and_merchant_name.csv \
+  --seq2seq-output models/merchant_name/seq2seq_model \
+  --epochs 3 \
+  --batch-size 8
+
+# Train both NER and Seq2Seq models together
+python -m transaction_categorization_v2.train \
+  --model all \
+  --data data/training_file_with_transaction_type_and_merchant_name.csv \
+  --epochs 3
+
+
+--------------------------------------------------------------------------------
+4. TRAIN CATEGORY CLASSIFICATION MODEL
+--------------------------------------------------------------------------------
+# Training data requires columns: normalized_description, merchant_name, amount,
+# dr_cr, transaction_type, category
+
+# Train category model with default settings
+python -m transaction_categorization_v2.train \
+  --model category \
+  --data data/training_file_with_transaction_type_and_merchant_name_and_category.csv
+
+# Train with custom parameters
+python -m transaction_categorization_v2.train \
+  --model category \
+  --data data/training_file_with_transaction_type_and_merchant_name_and_category.csv \
+  --category-output models/category \
+  --num-boost-round 500 \
+  --early-stopping 50 \
+  --embedding-model all-MiniLM-L6-v2
+
+
+--------------------------------------------------------------------------------
+5. PREDICTIONS - Merchant Name Extraction
+--------------------------------------------------------------------------------
+
+# Using NER model for merchant name extraction
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_with_merchant_ner.csv \
+  --merchant-model ner \
+  --ner-model-path models/merchant_name/ner_model \
+  -d
+
+# Using Seq2Seq model for merchant name extraction
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_with_merchant_seq2seq.csv \
+  --merchant-model seq2seq \
+  --seq2seq-model-path models/merchant_name/seq2seq_model \
+  -d
+
+
+--------------------------------------------------------------------------------
+6. PREDICTIONS - Category Classification
+--------------------------------------------------------------------------------
+
+# Category prediction on preprocessed data (with existing merchant_name column)
+python -m transaction_categorization_v2.main \
+  -i data/output/output_seq_1.csv \
+  -o data/output/output_with_category.csv \
+  --enable-category \
+  --merchant-column merchant_name \
+  --category-model-path models/category
+
+# Category prediction with merchant extraction (NER) in same pipeline
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_full_pipeline_ner.csv \
+  --merchant-model ner \
+  --enable-category \
+  -d
+
+# Category prediction with merchant extraction (Seq2Seq) in same pipeline
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/output_full_pipeline_seq2seq.csv \
+  --merchant-model seq2seq \
+  --enable-category \
+  -d
+
+# Without category confidence scores
+python -m transaction_categorization_v2.main \
+  -i data/output/output_seq_1.csv \
+  -o data/output/output_with_category.csv \
+  --enable-category \
+  --merchant-column merchant_name \
+  --no-category-confidence
+
+
+================================================================================
+FULL PIPELINE EXAMPLE (End-to-End)
+================================================================================
+
+# Step 1: Activate environment
+cd /Users/aniketbi/Desktop/Aniket/project_files_backups/categorization
+source venv/bin/activate
+
+# Step 2: Preprocess and identify transaction types
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/step1_preprocessed.csv \
+  -d
+
+# Step 3: Train models (if not already trained)
+python -m transaction_categorization_v2.train \
+  --model all \
+  --data data/training_file_with_transaction_type_and_merchant_name_and_category.csv
+
+# Step 4: Run full prediction pipeline
+python -m transaction_categorization_v2.main \
+  -i data/input_filename.csv \
+  -o data/output/final_categorized_output.csv \
+  --merchant-model seq2seq \
+  --enable-category \
+  -d
+
+
+================================================================================
+NOTES
+================================================================================
+
+1. Always activate virtual environment before running commands:
+   source venv/bin/activate
+
+2. Default model paths:
+   - NER Model: models/merchant_name/ner_model
+   - Seq2Seq Model: models/merchant_name/seq2seq_model
+   - Category Model: models/category
+
+3. Required columns for training:
+   - Merchant Name Models: description, merchant_name, amount, dr_cr
+   - Category Model: normalized_description, merchant_name, amount, dr_cr, 
+                     transaction_type, category
+
+4. Transaction Types Supported:
+   UPI, ACH-DR, ACH-CR, NACH, IMPS, NEFT, RTGS, CARD, CASH-CR, CASH-DR, 
+   EMI, SALARY, TAX, UNKNOWN
+
+================================================================================
+
