@@ -1,0 +1,27 @@
+# Transaction Categorization Dependencies
+# =======================================
+
+# Core ML Framework
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Text Processing
+rapidfuzz>=3.0.0
+
+# LightGBM + Text Embeddings for Category Classification
+lightgbm>=4.0.0
+sentence-transformers>=2.2.0
+
+# Utilities
+tqdm>=4.65.0
+accelerate>=0.26.0
+
+# Optional: For GPU Support
+# Install with: pip install torch --index-url https://download.pytorch.org/whl/cu118
+
